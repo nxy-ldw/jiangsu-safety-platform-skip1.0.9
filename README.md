@@ -32,8 +32,6 @@ jiangsu-safety-platform-skip
 # 2026-09-21修复
 ## 修复 jiangsu-safety-platform-skip 脚本（main/jiangsu-safety-platform-skip-main）
 
-平台 2026 年 9 月更新导致脚本失效，已逆向修复并用测试账号（南京信息职业技术学院 260404109）完整验证，得分 100，证书已下载。
-
 ### 问题根因（3 个）
 1. **课程提交被学习行为校验拦截**：平台新增 B3 埋点，答题前必须 POST `/wap/markArticleViewed`（articleId, userId）上报"课件已学完"，否则 unitTest 返回"请先完成本课程的学习后再作答"。发现方式：抓 `/wap/article` 页面内联 JS（`createExamSession()`）。
 2. **考试最短答题时长上调到 300 秒**（原来 5 秒），不足返回 1006。课程单元测试最短 10 秒即可。
@@ -47,11 +45,3 @@ jiangsu-safety-platform-skip
 - 平台 500 = 路径存在但参数/前置条件不满足，404 = 路径不存在
 - layui 前端：页面 JS 在 `/guns-vip-main/assets/modular/wap/<页面名>.js`，无需鉴权可直接读，从中找 ajax 端点
 - 课程页流转：compulsory.js → `/wap/directory` → directory.js → `/wap/article` → 内联 JS 有全部提交逻辑
-
-## 后续：GitHub 上传（取消）+ exe 打包（已完成）
-
-- 用户提供了 GitHub PAT（fine-grained，账号 nxy-ldw），但无 Administration 权限建不了仓库；本地已 git init + commit（含用户自己加的署名"一屿"版本），后来用户决定**不上传**
-- **PyInstaller 打包成功**：`--onefile --console --add-data "database.db;."`，产物复制到工作区根目录 `2026.v1.0.9-fixed.exe`（12.5MB）
-- exe 已用测试账号完整 E2E 验证：得分 100、证书下载到 exe 同目录
-- 坑：Windows 控制台默认 GBK，管道测试 exe 时输入需用 GBK 编码（`'...'.encode('gbk')`）
-- 打包关键点：onefile 模式下 `__file__` 指向 _MEIPASS 临时目录，database.db 必须 `--add-data` 打进包才能被 `os.path.abspath('database.db')` 找到
